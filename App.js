@@ -1,44 +1,55 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, Button, TextInput,  } from 'react-native';
+
+import React, { useState } from 'react'; 
+import { StyleSheet, Text, View, Button, TextInput, FlatList, InteractionManager,  } from 'react-native';
 
 export default function App() {
   const [result, setResult] = useState('');
   const [num1, setNum1] = useState('');
   const [num2, setNum2] = useState('');
+  const [data, setData] = useState([]);
 
-  const initialFocus = useRef(null);
-
+      
   const calculate = operator => {
+    console.log(num1, num2, operator);
     const [number1, number2] = [Number(num1), Number(num2)];
 
+    if (isNaN(number1) || isNaN(number2)) {
+      setResult(0);
+    } else {
+      let result = 0;
+    switch (operator) {
+      case '+':
+        result = number1 + number2;
+        break;
 
-  switch (operator) {
-    case '+':
-      setResult(number1+number2);
-      break;
+      case '-':
+        result = number1 - number2;
+        break;
+    }
+    setResult(result);
 
-    case '-':
-      setResult(number1-number2);
-      break;
+    const text = `${number1} ${operator} ${number2} = ${result}`;
+    setData([...data, text]);
   }
+  
   setNum1('');
   setNum2('');
-  initialFocus.current.focus();
+  
 }
-
+  
   return (
 
     <View style={styles.container}>
-    <Text>Result: {result}</Text>
-
-      <TextInput style={styles.textbox} ref={initialFocus}
-      keyboardType= 'number-pad'
+      
+      <Text>Result: {result}</Text>
+      <TextInput style={styles.textbox}
+      keyboardType= {'number-pad'}
       onChangeText={text => setNum1(text)} 
       value={num1}>
       </TextInput>
+
       <TextInput style={styles.textbox}
-      keyboardType= 'number-pad'
+      keyboardType= {'number-pad'}
       onChangeText={text => setNum2(text)} 
       value={num2}>
       </TextInput>
@@ -50,11 +61,16 @@ export default function App() {
       <View style={styles.buttons}>
         <Button title = "-" onPress={() => calculate('-')} />
       </View>
-    </View>
 
-    <StatusBar style="auto" />
-
-    </View>
+      <Text style = {styles.headers}>History</Text>
+      <FlatList style={styles.list}
+      data={data}
+      keyExtractor={ (item, index) => index}
+      renderItem={({item}) => <Text sytle={styles.textinput}>{item}</Text>
+  }
+  />
+      </View>
+     </View>
   );
 }
 
@@ -64,6 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+   
   },
   textbox: {
     borderColor: 'black',
@@ -81,6 +98,22 @@ const styles = StyleSheet.create({
     width: '20%',
     borderColor: 'black',
     borderWidth: 1,
-    margin: 10,
+    margin: 20,
+    marginBottom: 40,
+    
+  },
+  headers: {
+      marginTop: 30,
+      marginBottom: 10,
+      
+  },
+  list: {
+    flex: 1,
+    
+  },
+  textinput: {
+    marginTop: 30,
+    flexDirection: 'row',
   }
+
 });
